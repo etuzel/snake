@@ -1,0 +1,39 @@
+body {
+    margin: 0px;
+}
+
+#sn_main {
+    margin-left: 100px;
+    width: 300px;
+    height: 300px;
+    margin-top: 100px;
+    border: none;
+    background-color: #dedede;
+}
+
+.sn_point {
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    background-color: black;
+    width: 10px;
+    height: 10px;
+    position: absolute;
+}
+
+.sn_food {
+    background-image: linear-gradient(180deg, rgba(255,255,255,0) 40%, #000 40%, #fff 60%, rgba(255,255,255,0) 60%), linear-gradient(90deg, rgba(255,255,255,0) 40%, #000 40%, #fff 60%, rgba(255,255,255,0) 60%), linear-gradient(45deg, rgba(255,255,255,0) 43%, #000 43%, #fff 57%, rgba(255,255,255,0) 57%), linear-gradient(135deg, rgba(255,255,255,0) 43%, #000 43%, #fff 57%, rgba(255,255,255,0) 57%);
+    border-radius: 50%;
+    -webkit-transform-origin: left -20px;
+    -moz-transform-origin: left -20px;
+    -ms-transform-origin: left -20px;
+    width: 10px;
+    height: 10px;
+    position: absolute;
+}
+
+#sn_score {
+    float: left;
+    margin-top: -35px;
+    font-size: 30px;
+}
