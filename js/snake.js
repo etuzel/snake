@@ -1,32 +1,50 @@
-function Snake() {
-
-    var html = '' +
-            '<div id="sn_main">' +
-                '<div id="sn_info"><span id="sn_score"></span><span style="float:right">wasd</span></div>' +
-                '<div id="p1" class="sn_point" style="top:140px;left:100px;z-index: 1;"></div>' +
-                '<div id="p2" class="sn_point" style="top:130px;left:100px;"></div>' +
-                '<div id="p3" class="sn_point" style="top:120px;left:100px;"></div>' +
-            '</div>';
-    $('body').prepend(html);
+function Snake(ops) {
 
     var snake = this;
-    this.p_index = $('.sn_point').length;
-    this.head = $('#p1');
-    this.limit = { left: 100, top: 100, right: 390, bottom: 390 };
-    this.dir = 'd';
-    this.emptyArray = [];
-    this.bodyArray = [];
 
-    this.start = function () {
+    this.init = function (ops) {
 
-        for (var i = 100; i < 400; i = i + 10) {
-            for (var j = 100; j < 400; j = j + 10) {
-                if (i == 100 & j > 99 && j < 141)
+        var html = '' +
+        '<div id="sn_info"><span id="sn_score"></span><span style="float:right">wasd</span></div>' +
+        '<div id="p1" class="sn_point" style="top:20px;left:0px;z-index: 1;"></div>' +
+        '<div id="p2" class="sn_point" style="top:10px;left:0px;"></div>' +
+        '<div id="p3" class="sn_point" style="top:0px;left:0px;"></div>';
+        $('#sn_main').prepend(html);
+
+        $.extend(snake.defaultOptions, ops);
+        if (snake.defaultOptions.width % 10 > 0)
+            snake.defaultOptions.width = snake.defaultOptions.width - (snake.defaultOptions.width % 10);
+        if (snake.defaultOptions.height % 10 > 0)
+            snake.defaultOptions.height = snake.defaultOptions.height - (snake.defaultOptions.height % 10);
+        $('#sn_main').width(snake.defaultOptions.width).height(snake.defaultOptions.height);
+        $('#sn_info').width(snake.defaultOptions.width).css('margin-top', snake.defaultOptions.height + 'px');
+
+        for (var i = 0; i < snake.defaultOptions.width; i = i + 10) {
+            for (var j = 0; j < snake.defaultOptions.height; j = j + 10) {
+                if (i == 0 && j < 21)
                     snake.bodyArray.push([i, j]);
                 else
                     snake.emptyArray.push([i, j]);
             }
         }
+    };
+
+    this.defaultOptions = {
+        width: 250,
+        height: 250,
+        speed: 2
+    };
+    this.emptyArray = [];
+    this.bodyArray = [];
+
+    snake.init(ops);
+
+    this.dir = 'd';
+    this.p_index = $('.sn_point').length;
+    this.head = $('#p1');
+    this.limit = { left: 0, top: 0, right: snake.defaultOptions.width - 10, bottom: snake.defaultOptions.height - 10 };
+
+    this.start = function () {
 
         $(document).keydown(snake.keyDown);
         snake.feed();
@@ -78,7 +96,7 @@ function Snake() {
                 snake.bodyArray = snake.removeArrayElement(snake.bodyArray, prevLeft, prevTop);
             }
 
-            setTimeout(function () { snake.move(); }, 50);
+            setTimeout(function () { snake.move(); }, 100 / snake.defaultOptions.speed);
         }
         else {
 
