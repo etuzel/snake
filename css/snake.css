@@ -32,8 +32,9 @@ body {
     position: absolute;
 }
 
-#sn_score {
+#sn_info {
     float: left;
     margin-top: -35px;
     font-size: 30px;
+    width:300px;
 }
