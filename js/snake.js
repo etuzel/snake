@@ -5,22 +5,53 @@ function Snake(ops) {
     this.init = function (ops) {
 
         var html = '' +
-        '<div id="sn_info"><span id="sn_score"></span><span style="float:right">wasd</span></div>' +
+        '<div id="sn_info">' +
+        '   <span id="sn_options"></span>' +
+        '   <br>' +
+        '   Score: <span id="sn_score"></span>' +
+        '   <span style="float:right">wasd</span>' +
+        '</div>' +
         '<div id="p1" class="sn_point" style="top:20px;left:0px;z-index: 1;"></div>' +
         '<div id="p2" class="sn_point" style="top:10px;left:0px;"></div>' +
         '<div id="p3" class="sn_point" style="top:0px;left:0px;"></div>';
         $('#sn_main').prepend(html);
 
-        $.extend(snake.defaultOptions, ops);
-        if (snake.defaultOptions.width % 10 > 0)
-            snake.defaultOptions.width = snake.defaultOptions.width - (snake.defaultOptions.width % 10);
-        if (snake.defaultOptions.height % 10 > 0)
-            snake.defaultOptions.height = snake.defaultOptions.height - (snake.defaultOptions.height % 10);
-        $('#sn_main').width(snake.defaultOptions.width).height(snake.defaultOptions.height);
-        $('#sn_info').width(snake.defaultOptions.width).css('margin-top', snake.defaultOptions.height + 'px');
+        if (ops.speed && ops.speed > 10)
+            ops.speed = 2;
 
-        for (var i = 0; i < snake.defaultOptions.width; i = i + 10) {
-            for (var j = 0; j < snake.defaultOptions.height; j = j + 10) {
+        if (!ops.width) {
+
+            var w = $(window).width() - 200;
+            if (w < 250)
+                w = 250;
+            w = w - (w % 10);
+            ops.width = w;
+        }
+        else if (ops.width < 250)
+            ops.width = 250;
+
+        if (!ops.height) {
+
+            var h = $(window).height() - 200;
+            if (h < 250)
+                h = 250;
+            h = h - (h % 10);
+            ops.height = h;
+        }
+        else if (ops.height < 250)
+            ops.height = 250;
+
+        $.extend(snake.options, ops);
+        if (snake.options.width % 10 > 0)
+            snake.options.width = snake.options.width - (snake.options.width % 10);
+        if (snake.options.height % 10 > 0)
+            snake.options.height = snake.options.height - (snake.options.height % 10);
+        $('#sn_main').width(snake.options.width).height(snake.options.height);
+        $('#sn_options').html('options: '+JSON.stringify(snake.options));
+        $('#sn_info').width(snake.options.width);
+
+        for (var i = 0; i < snake.options.width; i = i + 10) {
+            for (var j = 0; j < snake.options.height; j = j + 10) {
                 if (i == 0 && j < 21)
                     snake.bodyArray.push([i, j]);
                 else
@@ -29,11 +60,7 @@ function Snake(ops) {
         }
     };
 
-    this.defaultOptions = {
-        width: 250,
-        height: 250,
-        speed: 2
-    };
+    this.options = { speed: 2 };
     this.emptyArray = [];
     this.bodyArray = [];
 
@@ -42,7 +69,7 @@ function Snake(ops) {
     this.dir = 'd';
     this.p_index = $('.sn_point').length;
     this.head = $('#p1');
-    this.limit = { left: 0, top: 0, right: snake.defaultOptions.width - 10, bottom: snake.defaultOptions.height - 10 };
+    this.limit = { left: 0, top: 0, right: snake.options.width - 10, bottom: snake.options.height - 10 };
 
     this.start = function () {
 
@@ -96,7 +123,7 @@ function Snake(ops) {
                 snake.bodyArray = snake.removeArrayElement(snake.bodyArray, prevLeft, prevTop);
             }
 
-            setTimeout(function () { snake.move(); }, 100 / snake.defaultOptions.speed);
+            setTimeout(function () { snake.move(); }, 100 / snake.options.speed);
         }
         else {
 

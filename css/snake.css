@@ -2,7 +2,7 @@
 #sn_main {
     border: none;
     background-color: #dedede;
-    position:relative;
+    position: relative;
 }
 
 .sn_point {
@@ -29,4 +29,9 @@
 #sn_info {
     float: left;
     font-size: 30px;
+    margin-top: -65px;
+}
+
+#sn_options {
+    font-size: 20px;
 }
