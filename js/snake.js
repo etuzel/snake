@@ -47,7 +47,7 @@ function Snake(ops) {
         if (snake.options.height % 10 > 0)
             snake.options.height = snake.options.height - (snake.options.height % 10);
         $('#sn_main').width(snake.options.width).height(snake.options.height);
-        $('#sn_options').html('options: '+JSON.stringify(snake.options));
+        $('#sn_options').html('options: ' + JSON.stringify(snake.options));
         $('#sn_info').width(snake.options.width);
 
         for (var i = 0; i < snake.options.width; i = i + 10) {
@@ -60,7 +60,7 @@ function Snake(ops) {
         }
     };
 
-    this.options = { speed: 2 };
+    this.options = { speed: 2, auto: false };
     this.emptyArray = [];
     this.bodyArray = [];
 
@@ -79,6 +79,9 @@ function Snake(ops) {
     };
 
     this.move = function () {
+
+        if (snake.options.auto)
+            snake.autoTurn();
 
         if (snake.control()) {
 
@@ -173,12 +176,29 @@ function Snake(ops) {
                 return false;
         }
 
-        var headPos = snake.head.position();
 
         for (var i = 0; i < snake.bodyArray.length - 1; i++) {
 
-            if (headPos.left == snake.bodyArray[i][0] && headPos.top == snake.bodyArray[i][1])
-                return false;
+            if (snake.dir == 'u') {
+
+                if (pos.left == snake.bodyArray[i][0] && pos.top == snake.bodyArray[i][1] + 10)
+                    return false;
+            }
+            else if (snake.dir == 'd') {
+
+                if (pos.left == snake.bodyArray[i][0] && pos.top == snake.bodyArray[i][1] - 10)
+                    return false;
+            }
+            else if (snake.dir == 'r') {
+
+                if (pos.top == snake.bodyArray[i][1] && pos.left == snake.bodyArray[i][0] - 10)
+                    return false;
+            }
+            else if (snake.dir == 'l') {
+
+                if (pos.top == snake.bodyArray[i][1] && pos.left == snake.bodyArray[i][0] + 10)
+                    return false;
+            }
         }
 
         return true;
@@ -222,6 +242,66 @@ function Snake(ops) {
 
             if (headPos.left == p2Pos.left)
                 snake.dir = 'l';
+        }
+    };
+
+    this.autoTurn = function () {
+
+        snake.saveTheSnake();
+
+        if (++snake.counterForAuto >= snake.p_index) {
+
+            var foodPos = $('.sn_food').position();
+            var pos = snake.head.position();
+
+            var leftDiff = foodPos.left - pos.left;
+            var topDiff = foodPos.top - pos.top;
+
+            if (leftDiff != 0 || topDiff != 0) { // if both are zero that means snake is eating right now. we'll wait for next food.
+
+                if (leftDiff == 0) {
+
+                    if (topDiff > 0)
+                        $.event.trigger({ type: 'keydown', which: 83 }); // down
+                    else
+                        $.event.trigger({ type: 'keydown', which: 87 }); // up
+
+                    snake.counterForAuto = 0;
+                }
+                else if (topDiff == 0) {
+
+                    if (leftDiff > 0)
+                        $.event.trigger({ type: 'keydown', which: 68 }); // right
+                    else
+                        $.event.trigger({ type: 'keydown', which: 65 }); // left
+
+                    snake.counterForAuto = 0;
+                }
+            }
+        }
+    };
+
+    this.counterForAuto = 0;
+
+    this.saveTheSnake = function () {
+
+        var pos = snake.head.position();
+        if (!snake.control()) { // game will be over. turn somewhere.
+
+            if (snake.dir == 'u' || snake.dir == 'd') {
+
+                if (Math.abs(snake.limit.left - pos.left) > Math.abs(snake.limit.right - pos.left))
+                    snake.dir = 'l';
+                else
+                    snake.dir = 'r';
+            }
+            else if (snake.dir == 'r' || snake.dir == 'l') {
+
+                if (Math.abs(snake.limit.top - pos.top) > Math.abs(snake.limit.bottom - pos.top))
+                    snake.dir = 'u';
+                else
+                    snake.dir = 'd';
+            }
         }
     };
 }

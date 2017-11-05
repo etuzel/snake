@@ -34,4 +34,6 @@
 
 #sn_options {
     font-size: 20px;
+    position: fixed;
+    width: 100%;
 }
