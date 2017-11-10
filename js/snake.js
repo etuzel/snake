@@ -77,7 +77,7 @@ function Snake(ops) {
             snake.options.height = snake.options.height - (snake.options.height % 10);
 
         $('#sn_main').width(snake.options.width).height(snake.options.height);
-        var temp = snake.options;
+        /*var temp = snake.options;
         if (temp.speed == 1)
             temp.speed = 'slow';
         else if (temp.speed == 3)
@@ -88,7 +88,7 @@ function Snake(ops) {
             temp.speed = 'faster';
         else if (temp.speed == 50)
             temp.speed = 'speed of light';
-        $('#sn_options').html('options: ' + JSON.stringify(temp));
+        $('#sn_options').html('options: ' + JSON.stringify(temp));*/
         $('#sn_info').width(snake.options.width);
 
         for (var i = 0; i < snake.options.width; i = i + 10) {
