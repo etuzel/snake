@@ -84,7 +84,7 @@ function Snake(ops) {
             snake.options.height = snake.options.height - (snake.options.height % 10);
 
         $('#sn_main').width(snake.options.width).height(snake.options.height);
-        var opsStr = snake.setOptionsStr();
+        snake.setOptionsStr();
         $('#sn_info').width(snake.options.width);
 
         for (var i = 0; i < snake.options.width; i = i + 10) {
