@@ -1,28 +1,33 @@
 
 $(document).ready(function () {
 
-    var html = '' +
-    '<div id="sn_info">' +
-    '   <div id="sn_options">' +
-    '       <input id="sn_width" type="number" class="sn_input" placeholder="width" title="width (min: 250)" min="250" step="10" />' +
-    '       <input id="sn_height" type="number" class="sn_input" placeholder="height" title="height (min: 250)" min="250" step="10" />' +
-    '       <select id="sn_speed" type="number" title="speed">' +
-    '           <option>slow</option>' +
-    '           <option>medium</option>' +
-    '           <option>fast</option>' +
-    '           <option>faster</option>' +
-    '           <option>speed of light</option>' +
-    '       </select>' +
-    '       <label for="sn_auto" >Auto Play:</label> <input id="sn_auto" type="checkbox" />' +
-    '       <button id="sn_startBtn" type="button" onclick="sn_start()">Start!</button>' +
-    '   </div>' +
-    '   <br>' +
-    '   Score: <span id="sn_score"></span><span style="float:right">wasd</span>' +
-    '</div>' +
-    '<div id="p1" class="sn_point" style="top:20px;left:0px;z-index: 1;"></div>' +
-    '<div id="p2" class="sn_point" style="top:10px;left:0px;"></div>' +
-    '<div id="p3" class="sn_point" style="top:0px;left:0px;"></div>';
-    $('#sn_main').prepend(html);
+    if ($('#sn_main').length == 1) {
+
+        var html = '' +
+        '<div id="sn_info">' +
+        '   <div id="sn_options">' +
+        '       <input id="sn_width" type="number" class="sn_input" placeholder="width" title="width (min: 250)" min="250" step="10" value="250" />' +
+        '       <input id="sn_height" type="number" class="sn_input" placeholder="height" title="height (min: 250)" min="250" step="10" value="250" />' +
+        '       <select id="sn_speed" type="number" title="speed">' +
+        '           <option>slow</option>' +
+        '           <option>medium</option>' +
+        '           <option selected>fast</option>' +
+        '           <option>faster</option>' +
+        '           <option>speed of light</option>' +
+        '       </select>' +
+        '       <label for="sn_auto" >Auto Play:</label> <input id="sn_auto" type="checkbox" />' +
+        '       <button id="sn_startBtn" type="button" onclick="sn_start()">Start!</button>' +
+        '   </div>' +
+        '   <br>' +
+        '   <span class="hideOnStart">Score:</span> <span id="sn_score"></span><span class="hideOnStart" style="float:right">wasd</span>' +
+        '</div>' +
+        '<div id="p1" class="sn_point hideOnStart" style="top:20px;left:0px;z-index: 1;"></div>' +
+        '<div id="p2" class="sn_point hideOnStart" style="top:10px;left:0px;"></div>' +
+        '<div id="p3" class="sn_point hideOnStart" style="top:0px;left:0px;"></div>';
+        $('#sn_main').prepend(html);
+
+        $('.hideOnStart').hide();
+    }
 });
 
 function sn_start() {
@@ -47,6 +52,8 @@ function Snake(ops) {
     var snake = this;
 
     this.init = function (ops) {
+
+        $('.hideOnStart').show();
 
         if (!ops.width) {
 
@@ -77,28 +84,7 @@ function Snake(ops) {
             snake.options.height = snake.options.height - (snake.options.height % 10);
 
         $('#sn_main').width(snake.options.width).height(snake.options.height);
-        
-        if (snake.options.speed == 1)
-            snake.options.speed = 'slow';
-        else if (snake.options.speed == 3)
-            snake.options.speed = 'medium';
-        else if (snake.options.speed == 6)
-            snake.options.speed = 'fast';
-        else if (snake.options.speed == 12)
-            snake.options.speed = 'faster';
-        else if (snake.options.speed == 50)
-            snake.options.speed = 'speed of light';
-        $('#sn_options').html('options: ' + JSON.stringify(snake.options));
-		if (snake.options.speed == 'slow')
-            snake.options.speed = 1;
-        else if (snake.options.speed == 'medium')
-            snake.options.speed = 3;
-        else if (snake.options.speed == 'fast')
-            snake.options.speed = 6;
-        else if (snake.options.speed == 'faster')
-            snake.options.speed = 12;
-        else if (snake.options.speed == 'speed of light')
-            snake.options.speed = 50;
+        var opsStr = snake.setOptionsStr();
         $('#sn_info').width(snake.options.width);
 
         for (var i = 0; i < snake.options.width; i = i + 10) {
@@ -110,6 +96,33 @@ function Snake(ops) {
             }
         }
     };
+
+    this.setOptionsStr = function () {
+
+        if (snake.options.speed == 1)
+            snake.options.speed = 'slow';
+        else if (snake.options.speed == 3)
+            snake.options.speed = 'medium';
+        else if (snake.options.speed == 6)
+            snake.options.speed = 'fast';
+        else if (snake.options.speed == 12)
+            snake.options.speed = 'faster';
+        else if (snake.options.speed == 50)
+            snake.options.speed = 'speed of light';
+
+        $('#sn_options').html('options: ' + JSON.stringify(snake.options));
+
+        if (snake.options.speed == 'slow')
+            snake.options.speed = 1;
+        else if (snake.options.speed == 'medium')
+            snake.options.speed = 3;
+        else if (snake.options.speed == 'fast')
+            snake.options.speed = 6;
+        else if (snake.options.speed == 'faster')
+            snake.options.speed = 12;
+        else if (snake.options.speed == 'speed of light')
+            snake.options.speed = 50;
+    }
 
     this.options = { speed: 2, auto: false };
     this.emptyArray = [];
