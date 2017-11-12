@@ -127,10 +127,12 @@ function Snake(ops) {
     this.options = { speed: 2, auto: false };
     this.emptyArray = [];
     this.bodyArray = [];
+    this.reasonsOfDeath = { LIMITS: 0, COLLISION: 1 };
+    this.directions = { UP: 0, DOWN: 1, RIGHT: 2, LEFT: 3 };
 
     snake.init(ops);
 
-    this.dir = 'd';
+    this.dir = snake.directions.DOWN;
     this.p_index = $('.sn_point').length;
     this.head = $('#p1');
     this.limit = { left: 0, top: 0, right: snake.options.width - 10, bottom: snake.options.height - 10 };
@@ -152,13 +154,13 @@ function Snake(ops) {
             var prevTop = snake.head.position().top;
             var prevLeft = snake.head.position().left;
 
-            if (snake.dir == 'r')
+            if (snake.dir == snake.directions.RIGHT)
                 snake.head.css('left', prevLeft + 10);
-            else if (snake.dir == 'l')
+            else if (snake.dir == snake.directions.LEFT)
                 snake.head.css('left', prevLeft - 10);
-            else if (snake.dir == 'u')
+            else if (snake.dir == snake.directions.UP)
                 snake.head.css('top', prevTop - 10);
-            else if (snake.dir == 'd')
+            else if (snake.dir == snake.directions.DOWN)
                 snake.head.css('top', prevTop + 10);
 
             var headPos = snake.head.position();
@@ -194,6 +196,7 @@ function Snake(ops) {
         }
         else {
 
+            console.log(Object.keys(snake.reasonsOfDeath)[snake.reasonOfDeath]);
             snake.head.css('background-color', 'red');
         }
     };
@@ -215,57 +218,79 @@ function Snake(ops) {
         return arr;
     };
 
+    this.reasonOfDeath = '';
     this.control = function () {
 
         var pos = snake.head.position();
+        var result = true;
 
-        if (snake.dir == 'u') {
+        if (snake.dir == snake.directions.UP) {
 
             if (pos.top == snake.limit.top)
-                return false;
+                result = false;
         }
-        else if (snake.dir == 'd') {
+        else if (snake.dir == snake.directions.DOWN) {
 
             if (pos.top == snake.limit.bottom)
-                return false;
+                result = false;
         }
-        else if (snake.dir == 'r') {
+        else if (snake.dir == snake.directions.RIGHT) {
 
             if (pos.left == snake.limit.right)
-                return false;
+                result = false;
         }
-        else if (snake.dir == 'l') {
+        else if (snake.dir == snake.directions.LEFT) {
 
             if (pos.left == snake.limit.left)
+                result = false;
+        }
+
+        if (result == false) {
+
+            snake.reasonOfDeath = snake.reasonsOfDeath.LIMITS;
+            return false;
+        }
+        else {
+
+            for (var i = 0; i < snake.bodyArray.length - 1; i++) {
+
+                if (snake.dir == snake.directions.UP) {
+
+                    if (pos.left == snake.bodyArray[i][0] && pos.top == snake.bodyArray[i][1] + 10) {
+                        result = false;
+                        break;
+                    }
+                }
+                else if (snake.dir == snake.directions.DOWN) {
+
+                    if (pos.left == snake.bodyArray[i][0] && pos.top == snake.bodyArray[i][1] - 10) {
+                        result = false;
+                        break;
+                    }
+                }
+                else if (snake.dir == snake.directions.RIGHT) {
+
+                    if (pos.top == snake.bodyArray[i][1] && pos.left == snake.bodyArray[i][0] - 10) {
+                        result = false;
+                        break;
+                    }
+                }
+                else if (snake.dir == snake.directions.LEFT) {
+
+                    if (pos.top == snake.bodyArray[i][1] && pos.left == snake.bodyArray[i][0] + 10) {
+                        result = false;
+                        break;
+                    }
+                }
+            }
+
+            if (result == false) {
+
+                snake.reasonOfDeath = snake.reasonsOfDeath.COLLISION;
                 return false;
+            }
+            else return true;
         }
-
-
-        for (var i = 0; i < snake.bodyArray.length - 1; i++) {
-
-            if (snake.dir == 'u') {
-
-                if (pos.left == snake.bodyArray[i][0] && pos.top == snake.bodyArray[i][1] + 10)
-                    return false;
-            }
-            else if (snake.dir == 'd') {
-
-                if (pos.left == snake.bodyArray[i][0] && pos.top == snake.bodyArray[i][1] - 10)
-                    return false;
-            }
-            else if (snake.dir == 'r') {
-
-                if (pos.top == snake.bodyArray[i][1] && pos.left == snake.bodyArray[i][0] - 10)
-                    return false;
-            }
-            else if (snake.dir == 'l') {
-
-                if (pos.top == snake.bodyArray[i][1] && pos.left == snake.bodyArray[i][0] + 10)
-                    return false;
-            }
-        }
-
-        return true;
     };
 
     this.feed = function () {
@@ -290,22 +315,22 @@ function Snake(ops) {
         if (e.which == 87) { //w pressed
 
             if (headPos.top == p2Pos.top)
-                snake.dir = 'u';
+                snake.dir = snake.directions.UP;
         }
         else if (e.which == 83) { //s pressed
 
             if (headPos.top == p2Pos.top)
-                snake.dir = 'd';
+                snake.dir = snake.directions.DOWN;
         }
         else if (e.which == 68) { //d pressed
 
             if (headPos.left == p2Pos.left)
-                snake.dir = 'r';
+                snake.dir = snake.directions.RIGHT;
         }
         else if (e.which == 65) { //a pressed
 
             if (headPos.left == p2Pos.left)
-                snake.dir = 'l';
+                snake.dir = snake.directions.LEFT;
         }
     };
 
@@ -321,7 +346,7 @@ function Snake(ops) {
             var leftDiff = foodPos.left - pos.left;
             var topDiff = foodPos.top - pos.top;
 
-            if (leftDiff != 0 || topDiff != 0) { // if both are zero that means snake is eating right now. we'll wait for next food.
+            if (leftDiff != 0 || topDiff != 0) { // snake is eating right now. we'll wait for next food.
 
                 if (leftDiff == 0) {
 
@@ -349,22 +374,29 @@ function Snake(ops) {
 
     this.saveTheSnake = function () {
 
-        var pos = snake.head.position();
         if (!snake.control()) { // game will be over. turn somewhere.
 
-            if (snake.dir == 'u' || snake.dir == 'd') {
+            var pos = snake.head.position();
+            if (/*snake.reasonOfDeath == snake.reasonsOfDeath.LIMITS*/true) { //todo
 
-                if (Math.abs(snake.limit.left - pos.left) > Math.abs(snake.limit.right - pos.left))
-                    snake.dir = 'l';
-                else
-                    snake.dir = 'r';
+                if (snake.dir == snake.directions.UP || snake.dir == snake.directions.DOWN) {
+
+                    if (Math.abs(snake.limit.left - pos.left) > Math.abs(snake.limit.right - pos.left))
+                        snake.dir = snake.directions.LEFT;
+                    else
+                        snake.dir = snake.directions.RIGHT;
+                }
+                else if (snake.dir == snake.directions.RIGHT || snake.dir == snake.directions.LEFT) {
+
+                    if (Math.abs(snake.limit.top - pos.top) > Math.abs(snake.limit.bottom - pos.top))
+                        snake.dir = snake.directions.UP;
+                    else
+                        snake.dir = snake.directions.DOWN;
+                }
             }
-            else if (snake.dir == 'r' || snake.dir == 'l') {
+            else if (snake.reasonOfDeath == snake.reasonsOfDeath.COLLISION) {
 
-                if (Math.abs(snake.limit.top - pos.top) > Math.abs(snake.limit.bottom - pos.top))
-                    snake.dir = 'u';
-                else
-                    snake.dir = 'd';
+
             }
         }
     };
