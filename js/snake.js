@@ -155,13 +155,13 @@ function Snake(ops) {
             var prevLeft = snake.head.position().left;
 
             if (snake.dir == snake.directions.RIGHT)
-                snake.head.css('left', prevLeft + 10);
+                snake.head.css('left', (prevLeft + 10) + 'px');
             else if (snake.dir == snake.directions.LEFT)
-                snake.head.css('left', prevLeft - 10);
+                snake.head.css('left', (prevLeft - 10) + 'px');
             else if (snake.dir == snake.directions.UP)
-                snake.head.css('top', prevTop - 10);
+                snake.head.css('top', (prevTop - 10) + 'px');
             else if (snake.dir == snake.directions.DOWN)
-                snake.head.css('top', prevTop + 10);
+                snake.head.css('top', (prevTop + 10) + 'px');
 
             var headPos = snake.head.position();
 
@@ -180,7 +180,7 @@ function Snake(ops) {
 
             for (var i = snake.bodyArray.length - 3; i >= 0; i--) {
 
-                $('#p' + (snake.bodyArray.length - i - 1)).css('left', prevLeft).css('top', prevTop);
+                $('#p' + (snake.bodyArray.length - i - 1)).css('left', prevLeft).css('top', prevTop + 'px');
 
                 prevLeft = snake.bodyArray[i][0];
                 prevTop = snake.bodyArray[i][1];
@@ -296,13 +296,13 @@ function Snake(ops) {
     this.feed = function () {
 
         var rand = snake.emptyArray[Math.floor(Math.random() * snake.emptyArray.length)];
-        $('#sn_main').append('<div class="sn_food" style="top:' + rand[1] + ';left:' + rand[0] + '"></div>');
+        $('#sn_main').append('<div class="sn_food" style="top:' + rand[1] + 'px;left:' + rand[0] + 'px"></div>');
     };
 
     this.eat = function () {
 
         var pos = $('#p' + snake.p_index).position();
-        $('#p' + snake.p_index).after('<div style="top:' + pos.top + ';left:' + pos.left + '" id="p' + (++snake.p_index) + '" class="sn_point"></div>');
+        $('#p' + snake.p_index).after('<div style="top:' + pos.top + 'px;left:' + pos.left + 'px" id="p' + (++snake.p_index) + '" class="sn_point"></div>');
         $('.sn_food').remove();
         snake.feed();
     };
