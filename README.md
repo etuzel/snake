@@ -1,2 +1,2 @@
 # snake
-<a href="https://etuzel.github.io/snake/" target="_blank">Snake game</a> with html, css, javascript and jquery
+Snake game with html, css, javascript and jquery. <a href="https://etuzel.github.io/snake/" target="_blank">Click here for the live demo</a>
