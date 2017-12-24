@@ -9,14 +9,14 @@
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
-    background-color: black;
+    background-color: #037d12;
     width: 10px;
     height: 10px;
     position: absolute;
 }
 
 .sn_food {
-    background-image: linear-gradient(180deg, rgba(255,255,255,0) 40%, #000 40%, #fff 60%, rgba(255,255,255,0) 60%), linear-gradient(90deg, rgba(255,255,255,0) 40%, #000 40%, #fff 60%, rgba(255,255,255,0) 60%), linear-gradient(45deg, rgba(255,255,255,0) 43%, #000 43%, #fff 57%, rgba(255,255,255,0) 57%), linear-gradient(135deg, rgba(255,255,255,0) 43%, #000 43%, #fff 57%, rgba(255,255,255,0) 57%);
+    background-image: linear-gradient(180deg, rgba(255,255,255,0) 40%, #f00 40%, #fff 60%, rgba(255,255,255,0) 60%), linear-gradient(90deg, rgba(255,255,255,0) 40%, #f00 40%, #fff 60%, rgba(255,255,255,0) 60%), linear-gradient(45deg, rgba(255,255,255,0) 43%, #f00 43%, #fff 57%, rgba(255,255,255,0) 57%), linear-gradient(135deg, rgba(255,255,255,0) 43%, #f00 43%, #fff 57%, rgba(255,255,255,0) 57%);
     border-radius: 50%;
     -webkit-transform-origin: left -20px;
     -moz-transform-origin: left -20px;
@@ -27,15 +27,16 @@
 }
 
 #sn_info {
-    float: left;
-    font-size: 30px;
-    margin-top: -85px;
+    font-size: 26px;
+    margin-left: 20px;
 }
 
 #sn_options {
-    font-size: 18px;
-    position: fixed;
-    width: 100%;
+    font-size: 16px;
+}
+
+.sn_reload {
+    margin-left:10px;
 }
 
 .sn_input {

@@ -3,28 +3,36 @@ $(document).ready(function () {
 
     if ($('#sn_main').length == 1) {
 
-        var html = '' +
-        '<div id="sn_info">' +
-        '   <div id="sn_options">' +
-        '       <input id="sn_width" type="number" class="sn_input" placeholder="width" title="width (min: 250)" min="250" step="10" value="250" />' +
-        '       <input id="sn_height" type="number" class="sn_input" placeholder="height" title="height (min: 250)" min="250" step="10" value="250" />' +
-        '       <select id="sn_speed" type="number" title="speed">' +
-        '           <option>slow</option>' +
-        '           <option>medium</option>' +
-        '           <option selected>fast</option>' +
-        '           <option>faster</option>' +
-        '           <option>speed of light</option>' +
-        '       </select>' +
-        '       <label for="sn_auto" >Auto Play:</label> <input id="sn_auto" type="checkbox" />' +
-        '       <button id="sn_startBtn" type="button" onclick="sn_start()">Start!</button>' +
-        '   </div>' +
-        '   <br>' +
-        '   <span class="hideOnStart">Score:</span> <span id="sn_score"></span><span class="hideOnStart" style="float:right">wasd</span>' +
-        '</div>' +
-        '<div id="p1" class="sn_point hideOnStart" style="top:20px;left:0px;z-index: 1;"></div>' +
-        '<div id="p2" class="sn_point hideOnStart" style="top:10px;left:0px;"></div>' +
-        '<div id="p3" class="sn_point hideOnStart" style="top:0px;left:0px;"></div>';
-        $('#sn_main').prepend(html);
+        var info = '' +
+            '<div id="sn_info">' +
+            '   <span id="sn_options">' +
+            '       <input id="sn_width" type="number" class="sn_input" placeholder="width" title="width (min: 250)" min="250" step="10" value="250" />' +
+            '       <input id="sn_height" type="number" class="sn_input" placeholder="height" title="height (min: 250)" min="250" step="10" value="250" />' +
+            '       <select id="sn_speed" type="number" title="speed">' +
+            '           <option>slow</option>' +
+            '           <option selected>medium</option>' +
+            '           <option>fast</option>' +
+            '           <option>faster</option>' +
+            '           <option>speed of light</option>' +
+            '       </select>' +
+            '       <label for="sn_auto" >Auto Play:</label> <input id="sn_auto" type="checkbox" />' +
+            '       <button id="sn_startBtn" type="button" onclick="sn_start()">Start!</button>' +
+            '   </span>' +
+            '   <br>' +
+            '   <span class="hideOnStart">Controls: wasd or arrows</span>' +
+            '   <br>' +
+            '   <span class="hideOnStart">Score:</span> <span id="sn_score"></span>' +
+            '</div>';
+
+        var init = '' +
+            '<div id="p1" class="sn_point hideOnStart" style="top:20px;left:0px;z-index: 1;background-color:black"></div>' +
+            '<div id="p2" class="sn_point hideOnStart" style="top:10px;left:0px;"></div>' +
+            '<div id="p3" class="sn_point hideOnStart" style="top:0px;left:0px;"></div>';
+
+        var container = $('<div style="margin:20px">');
+
+        $('#sn_main').before(container).prepend(init).after(info);
+        container.append($('#sn_main'));
 
         $('.hideOnStart').hide();
     }
@@ -57,7 +65,7 @@ function Snake(ops) {
 
         if (!ops.width) {
 
-            var w = $(window).width() - 200;
+            var w = $(window).width() - 40;
             if (w < 250)
                 w = 250;
             w = w - (w % 10);
@@ -68,7 +76,7 @@ function Snake(ops) {
 
         if (!ops.height) {
 
-            var h = $(window).height() - 200;
+            var h = $(window).height() - 40;
             if (h < 250)
                 h = 250;
             h = h - (h % 10);
@@ -85,7 +93,6 @@ function Snake(ops) {
 
         $('#sn_main').width(snake.options.width).height(snake.options.height);
         snake.setOptionsStr();
-        $('#sn_info').width(snake.options.width);
 
         for (var i = 0; i < snake.options.width; i = i + 10) {
             for (var j = 0; j < snake.options.height; j = j + 10) {
@@ -180,7 +187,7 @@ function Snake(ops) {
 
             for (var i = snake.bodyArray.length - 3; i >= 0; i--) {
 
-                $('#p' + (snake.bodyArray.length - i - 1)).css('left', prevLeft).css('top', prevTop + 'px');
+                $('#p' + (snake.bodyArray.length - i - 1)).css('left', prevLeft + 'px').css('top', prevTop + 'px');
 
                 prevLeft = snake.bodyArray[i][0];
                 prevTop = snake.bodyArray[i][1];
@@ -198,6 +205,7 @@ function Snake(ops) {
 
             console.log(Object.keys(snake.reasonsOfDeath)[snake.reasonOfDeath]);
             snake.head.css('background-color', 'red');
+            $('#sn_score').after('<a href="#" class="sn_reload" onclick="javascript:location.reload();">Play Again</a>');
         }
     };
 
@@ -292,7 +300,7 @@ function Snake(ops) {
             else return true;
         }
     };
-
+    
     this.feed = function () {
 
         var rand = snake.emptyArray[Math.floor(Math.random() * snake.emptyArray.length)];
@@ -312,22 +320,22 @@ function Snake(ops) {
         var headPos = snake.head.position();
         var p2Pos = $('#p2').position();
 
-        if (e.which == 87) { //w pressed
+        if (e.which == 87 || e.which == 38) { //w or up arrow pressed
 
             if (headPos.top == p2Pos.top)
                 snake.dir = snake.directions.UP;
         }
-        else if (e.which == 83) { //s pressed
+        else if (e.which == 83 || e.which == 40) { //s or down arrow pressed
 
             if (headPos.top == p2Pos.top)
                 snake.dir = snake.directions.DOWN;
         }
-        else if (e.which == 68) { //d pressed
+        else if (e.which == 68 || e.which == 39) { //d or right arrow pressed
 
             if (headPos.left == p2Pos.left)
                 snake.dir = snake.directions.RIGHT;
         }
-        else if (e.which == 65) { //a pressed
+        else if (e.which == 65 || e.which == 37) { //a or left arrow pressed
 
             if (headPos.left == p2Pos.left)
                 snake.dir = snake.directions.LEFT;
