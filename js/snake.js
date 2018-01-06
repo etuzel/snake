@@ -203,7 +203,8 @@ function Snake(ops) {
         }
         else {
 
-            console.log(Object.keys(snake.reasonsOfDeath)[snake.reasonOfDeath]);
+            console.log("Reason Of Death: " + Object.keys(snake.reasonsOfDeath)[snake.reasonOfDeath]);
+            console.log("Last Direction: " + Object.keys(snake.directions)[snake.dir]);
             snake.head.css('background-color', 'red');
             $('#sn_score').after('<a href="#" class="sn_reload" onclick="javascript:location.reload();">Play Again</a>');
         }
@@ -300,7 +301,7 @@ function Snake(ops) {
             else return true;
         }
     };
-    
+
     this.feed = function () {
 
         var rand = snake.emptyArray[Math.floor(Math.random() * snake.emptyArray.length)];
@@ -342,6 +343,16 @@ function Snake(ops) {
         }
     };
 
+    this.turn = {
+
+        up: function () { $.event.trigger({ type: 'keydown', which: 87 }); }
+        , down: function () { $.event.trigger({ type: 'keydown', which: 83 }); }
+        , right: function () { $.event.trigger({ type: 'keydown', which: 68 }); }
+        , left: function () { $.event.trigger({ type: 'keydown', which: 65 }); }
+    }
+
+    this.counterForAuto = 0;
+
     this.autoTurn = function () {
 
         snake.saveTheSnake();
@@ -358,19 +369,67 @@ function Snake(ops) {
 
                 if (leftDiff == 0) {
 
-                    if (topDiff > 0)
-                        $.event.trigger({ type: 'keydown', which: 83 }); // down
-                    else
-                        $.event.trigger({ type: 'keydown', which: 87 }); // up
+                    if (topDiff > 0) {
+
+                        var bodyPartsAtDown = snake.bodyArray.filter(function (x) { return x[0] == foodPos.left && x[1] < foodPos.top && x[1] > pos.top; });
+                        if (bodyPartsAtDown.length > 0) {
+
+                            if (pos.top != snake.limit.top && snake.bodyParts.upEmpty())
+                                snake.turn.up();
+                        }
+                        else {
+
+                            if (pos.top != snake.limit.bottom && snake.bodyParts.downEmpty())
+                                snake.turn.down();
+                        }
+                    }
+                    else {
+
+                        var bodyPartsAtUp = snake.bodyArray.filter(function (x) { return x[0] == foodPos.left && x[1] > foodPos.top && x[1] < pos.top; });
+                        if (bodyPartsAtUp.length > 0) {
+
+                            if (pos.top != snake.limit.bottom && snake.bodyParts.downEmpty())
+                                snake.turn.down();
+                        }
+                        else {
+
+                            if (pos.top != snake.limit.top && snake.bodyParts.upEmpty())
+                                snake.turn.up();
+                        }
+                    }
 
                     snake.counterForAuto = 0;
                 }
                 else if (topDiff == 0) {
 
-                    if (leftDiff > 0)
-                        $.event.trigger({ type: 'keydown', which: 68 }); // right
-                    else
-                        $.event.trigger({ type: 'keydown', which: 65 }); // left
+                    if (leftDiff > 0) {
+
+                        var bodyPartsAtRight = snake.bodyArray.filter(function (x) { return x[0] < foodPos.left && x[0] > pos.left && x[1] == foodPos.top; });
+                        if (bodyPartsAtRight.length > 0) {
+
+                            if (pos.left != snake.limit.left && snake.bodyParts.leftEmpty())
+                                snake.turn.left();
+                        }
+                        else {
+
+                            if (pos.left != snake.limit.right && snake.bodyParts.rightEmpty())
+                                snake.turn.right();
+                        }
+                    }
+                    else {
+
+                        var bodyPartsAtLeft = snake.bodyArray.filter(function (x) { return x[0] > foodPos.left && x[0] < pos.left && x[1] == foodPos.top; });
+                        if (bodyPartsAtLeft.length > 0) {
+
+                            if (pos.left != snake.limit.right && snake.bodyParts.rightEmpty())
+                                snake.turn.right();
+                        }
+                        else {
+
+                            if (pos.left != snake.limit.left && snake.bodyParts.leftEmpty())
+                                snake.turn.left();
+                        }
+                    }
 
                     snake.counterForAuto = 0;
                 }
@@ -378,33 +437,171 @@ function Snake(ops) {
         }
     };
 
-    this.counterForAuto = 0;
+    this.inCircle = function () { // coming here after collision
+
+        var pos = snake.head.position();
+
+        var bodyPartAtUp = snake.bodyParts.upEmpty() ? 0 : 1;
+        var bodyPartAtDown = snake.bodyParts.downEmpty() ? 0 : 1;
+        var bodyPartAtRight = snake.bodyParts.rightEmpty() ? 0 : 1;
+        var bodyPartAtLeft = snake.bodyParts.leftEmpty() ? 0 : 1;
+
+        if (bodyPartAtUp == 0 && pos.top == snake.limit.top)
+            bodyPartAtUp++;
+        if (bodyPartAtDown == 0 && pos.top == snake.limit.bottom)
+            bodyPartAtDown++;
+        if (bodyPartAtRight == 0 && pos.left == snake.limit.right)
+            bodyPartAtRight++;
+        if (bodyPartAtLeft == 0 && pos.left == snake.limit.left)
+            bodyPartAtLeft++;
+
+        if (bodyPartAtUp + bodyPartAtDown + bodyPartAtRight + bodyPartAtLeft == 3) { // is in circle
+
+            if (bodyPartAtUp == 0)
+                return snake.directions.UP;
+            else if (bodyPartAtDown == 0)
+                return snake.directions.DOWN;
+            else if (bodyPartAtRight == 0)
+                return snake.directions.RIGHT;
+            else if (bodyPartAtLeft == 0)
+                return snake.directions.LEFT;
+        }
+        else return null;
+    };
+
+    this.bodyParts = {
+
+        getIndex: function (left, top) {
+
+            for (var i = 1; i <= snake.bodyArray.length; i++) {
+
+                var pos = $('#p' + i).position()
+                if (pos.left == left && pos.top == top)
+                    return i;
+            }
+            return snake.bodyArray.length; // returning the last if not found
+        }
+
+        , upEmpty: function () {
+
+            var pos = snake.head.position();
+            return snake.bodyArray.filter(function (x) { return x[0] == pos.left && x[1] == pos.top - 10; }).length == 0;
+        }
+
+        , downEmpty: function () {
+
+            var pos = snake.head.position();
+            return snake.bodyArray.filter(function (x) { return x[0] == pos.left && x[1] == pos.top + 10; }).length == 0;
+        }
+
+        , rightEmpty: function () {
+
+            var pos = snake.head.position();
+            return snake.bodyArray.filter(function (x) { return x[0] == pos.left + 10 && x[1] == pos.top; }).length == 0;
+        }
+
+        , leftEmpty: function () {
+
+            var pos = snake.head.position();
+            return snake.bodyArray.filter(function (x) { return x[0] == pos.left - 10 && x[1] == pos.top; }).length == 0;
+        }
+    };
 
     this.saveTheSnake = function () {
 
         if (!snake.control()) { // game will be over. turn somewhere.
 
             var pos = snake.head.position();
-            if (/*snake.reasonOfDeath == snake.reasonsOfDeath.LIMITS*/true) { //todo
+            if (snake.reasonOfDeath == snake.reasonsOfDeath.LIMITS) {
 
                 if (snake.dir == snake.directions.UP || snake.dir == snake.directions.DOWN) {
 
-                    if (Math.abs(snake.limit.left - pos.left) > Math.abs(snake.limit.right - pos.left))
-                        snake.dir = snake.directions.LEFT;
-                    else
-                        snake.dir = snake.directions.RIGHT;
+                    var bodyPartsAtLeft = snake.bodyArray.filter(function (x) { return x[0] < pos.left && x[1] == pos.top; });
+                    var bodyPartsAtRight = snake.bodyArray.filter(function (x) { return x[0] > pos.left && x[1] == pos.top; });
+
+                    if (Math.abs(snake.limit.left - pos.left) > Math.abs(snake.limit.right - pos.left)) {
+
+                        if (bodyPartsAtLeft.length > bodyPartsAtRight.length && pos.left != snake.limit.right)
+                            snake.turn.right();
+                        else
+                            snake.turn.left();
+                    }
+                    else {
+
+                        if (bodyPartsAtLeft.length < bodyPartsAtRight.length && pos.left != snake.limit.left)
+                            snake.turn.left();
+                        else
+                            snake.turn.right();
+                    }
                 }
                 else if (snake.dir == snake.directions.RIGHT || snake.dir == snake.directions.LEFT) {
 
-                    if (Math.abs(snake.limit.top - pos.top) > Math.abs(snake.limit.bottom - pos.top))
-                        snake.dir = snake.directions.UP;
-                    else
-                        snake.dir = snake.directions.DOWN;
+                    var bodyPartsAtUp = snake.bodyArray.filter(function (x) { return x[0] == pos.left && x[1] < pos.top; });
+                    var bodyPartsAtDown = snake.bodyArray.filter(function (x) { return x[0] == pos.left && x[1] > pos.top; });
+
+                    if (Math.abs(snake.limit.top - pos.top) > Math.abs(snake.limit.bottom - pos.top)) {
+
+                        if (bodyPartsAtUp.length > bodyPartsAtDown.length && pos.top != snake.limit.bottom)
+                            snake.turn.down();
+                        else
+                            snake.turn.up();
+                    }
+                    else {
+
+                        if (bodyPartsAtUp.length < bodyPartsAtDown.length && pos.top != snake.limit.top)
+                            snake.turn.up();
+                        else
+                            snake.turn.down();
+                    }
                 }
             }
             else if (snake.reasonOfDeath == snake.reasonsOfDeath.COLLISION) {
 
+                var turnToThisDirectionIfInCircle = snake.inCircle();
+                if (turnToThisDirectionIfInCircle || turnToThisDirectionIfInCircle == 0) {
 
+                    //todo: find some ways to get out of the circle
+
+                    if (turnToThisDirectionIfInCircle == snake.directions.UP)
+                        snake.turn.up();
+                    else if (turnToThisDirectionIfInCircle == snake.directions.DOWN)
+                        snake.turn.down();
+                    else if (turnToThisDirectionIfInCircle == snake.directions.RIGHT)
+                        snake.turn.right();
+                    else if (turnToThisDirectionIfInCircle == snake.directions.LEFT)
+                        snake.turn.left();
+                }
+                else {
+
+                    if (snake.dir == snake.directions.UP || snake.dir == snake.directions.DOWN) {
+
+                        if (pos.left == snake.limit.left)
+                            snake.turn.right();
+                        else {
+
+                            var index = snake.bodyParts.getIndex(pos.left, (snake.dir == snake.directions.UP ? (pos.top - 10) : (pos.top + 10))) - 1;
+                            var tempPos = $('#p' + index).position();
+                            if (pos.left == snake.limit.right || tempPos.left > pos.left)
+                                snake.turn.left();
+                            else
+                                snake.turn.right();
+                        }
+                    }
+                    else if (snake.dir == snake.directions.RIGHT || snake.dir == snake.directions.LEFT) {
+
+                        if (pos.top == snake.limit.top)
+                            snake.turn.down();
+                        else {
+
+                            var index = snake.bodyParts.getIndex((snake.dir == snake.directions.LEFT ? (pos.left - 10) : (pos.left + 10)), pos.top) - 1;
+                            var tempPos = $('#p' + index).position();
+                            if (pos.top == snake.limit.bottom || tempPos.top > pos.top)
+                                snake.turn.up();
+                            else
+                                snake.turn.down();
+                        }
+                    }
+                }
             }
         }
     };
