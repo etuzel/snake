@@ -349,9 +349,11 @@ function Snake(ops) {
         , down: function () { $.event.trigger({ type: 'keydown', which: 83 }); }
         , right: function () { $.event.trigger({ type: 'keydown', which: 68 }); }
         , left: function () { $.event.trigger({ type: 'keydown', which: 65 }); }
-    }
+    };
 
     this.counterForAuto = 0;
+
+    this.nextMoveDir = null;
 
     this.autoTurn = function () {
 
@@ -558,18 +560,40 @@ function Snake(ops) {
             else if (snake.reasonOfDeath == snake.reasonsOfDeath.COLLISION) {
 
                 var turnToThisDirectionIfInCircle = snake.inCircle();
-                if (turnToThisDirectionIfInCircle || turnToThisDirectionIfInCircle == 0) {
+                if (turnToThisDirectionIfInCircle != null) {
 
-                    //todo: find some ways to get out of the circle
+                    if (turnToThisDirectionIfInCircle == snake.directions.UP) {
 
-                    if (turnToThisDirectionIfInCircle == snake.directions.UP)
                         snake.turn.up();
-                    else if (turnToThisDirectionIfInCircle == snake.directions.DOWN)
+                        if (snake.bodyArray.filter(function (x) { return x[0] == pos.left - 10 && x[1] == pos.top - 10; }).length == 0)
+                            snake.nextMoveDir = snake.directions.LEFT;
+                        else if (snake.bodyArray.filter(function (x) { return x[0] == pos.left + 10 && x[1] == pos.top - 10; }).length == 0)
+                            snake.nextMoveDir = snake.directions.RIGHT;
+                    }
+                    else if (turnToThisDirectionIfInCircle == snake.directions.DOWN) {
+
                         snake.turn.down();
-                    else if (turnToThisDirectionIfInCircle == snake.directions.RIGHT)
+                        if (snake.bodyArray.filter(function (x) { return x[0] == pos.left - 10 && x[1] == pos.top + 10; }).length == 0)
+                            snake.nextMoveDir = snake.directions.LEFT;
+                        else if (snake.bodyArray.filter(function (x) { return x[0] == pos.left + 10 && x[1] == pos.top + 10; }).length == 0)
+                            snake.nextMoveDir = snake.directions.RIGHT;
+                    }
+                    else if (turnToThisDirectionIfInCircle == snake.directions.RIGHT) {
+
                         snake.turn.right();
-                    else if (turnToThisDirectionIfInCircle == snake.directions.LEFT)
+                        if (snake.bodyArray.filter(function (x) { return x[0] == pos.left + 10 && x[1] == pos.top + 10; }).length == 0)
+                            snake.nextMoveDir = snake.directions.DOWN;
+                        else if (snake.bodyArray.filter(function (x) { return x[0] == pos.left + 10 && x[1] == pos.top - 10; }).length == 0)
+                            snake.nextMoveDir = snake.directions.UP;
+                    }
+                    else if (turnToThisDirectionIfInCircle == snake.directions.LEFT) {
+
                         snake.turn.left();
+                        if (snake.bodyArray.filter(function (x) { return x[0] == pos.left - 10 && x[1] == pos.top - 10; }).length == 0)
+                            snake.nextMoveDir = snake.directions.UP;
+                        else if (snake.bodyArray.filter(function (x) { return x[0] == pos.left - 10 && x[1] == pos.top + 10; }).length == 0)
+                            snake.nextMoveDir = snake.directions.DOWN;
+                    }
                 }
                 else {
 
@@ -603,6 +627,19 @@ function Snake(ops) {
                     }
                 }
             }
+        }
+        else if (snake.nextMoveDir != null) {
+
+            if (snake.nextMoveDir == snake.directions.UP)
+                snake.turn.up();
+            else if (snake.nextMoveDir == snake.directions.DOWN)
+                snake.turn.down();
+            else if (snake.nextMoveDir == snake.directions.RIGHT)
+                snake.turn.right();
+            else if (snake.nextMoveDir == snake.directions.LEFT)
+                snake.turn.left();
+
+            snake.nextMoveDir = null;
         }
     };
 }
